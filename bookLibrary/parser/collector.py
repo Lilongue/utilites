@@ -1,15 +1,47 @@
 import os
-import shutil
+import sys
 import pyperclip
 
-def import_path():
-    print ("Скопируйте путь к папке")
-    path = input()
-    if path == "":
-        path = pyperclip.paste()
-    if os.path.exists(path):
-        return path
-    return None
+
+THRESHOLD = 80
+SEPARATOR = "_"
+SEP_FOR_STAT = "_-+. /|\\"
+SKIP_EXTENTIONS = ["zip", "rar", "gif", "htm", "html", "auto", "info", "last"]
+
+def get_path():
+    """
+    Get path from console user input or clipboard or from argument.
+
+    Returns:
+        str: The path as a string.
+    """
+
+    path = None
+
+    # Try to get path from argument
+    if len(sys.argv) >= 2:
+        path = sys.argv[1]
+        if not os.path.exists(path):
+            path = None
+    
+    # Try to get path from console input
+    if path is None:
+        path = input('Скопируйте или введите путь к папке: ')
+
+    # Try to get path from clipboard
+    if not path:
+        try:
+            path = pyperclip.paste()
+        except:
+            pass
+
+    # Check if path is valid
+    if not (path and os.path.exists(path)):
+        print(f'Error: Path {path} does not exist.')
+        return None
+
+    return path
+
 
 def get_patterns(inp_str, delimiter = None):
     delimiters = "_-. /"
@@ -53,15 +85,21 @@ def check_pattern(pat1, pat2):
     return int(100*(matches/pat_len))
 
 
+def count_separators(dictionary, separators):
+    separator_counts = []
+    for separator in separators:
+        separator_counts.append(0)
+    for value in dictionary.values():
+        for i, separator in enumerate(separators):
+            separator_counts[i] += value.count(separator)
+    return separator_counts
+
+
 dic_names = {}
 dic_paths = {}
 dic_pattern = {}
-THRESHOLD = 80
-SEPARATOR = "_"
-SEP_FOR_STAT = "_-+. /|\\"
-SKIP_EXTENTIONS = ["zip", "rar", "gif", "htm", "html", "auto", "info", "last"]
 
-start_path = import_path()
+start_path = get_path()
 if start_path:
     i = 1
     for p, dirs, files in os.walk(start_path):
@@ -71,14 +109,7 @@ if start_path:
             i += 1
     print ("Найдено %s файлов" %(i))
 
-def count_separators(dictionary, separators):
-    separator_counts = []
-    for separator in separators:
-        separator_counts.append(0)
-    for value in dictionary.values():
-        for i, separator in enumerate(separators):
-            separator_counts[i] += value.count(separator)
-    return separator_counts
+
 
 
 print (list(SEP_FOR_STAT))
