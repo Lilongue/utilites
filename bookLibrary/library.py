@@ -1,43 +1,25 @@
+from book import Book
+
+
 class Library:
 
     def __init__(self):
-        pass
+        self._books = []
+
+    def add_book(self, book):
+        self._books.append(book)
 
     def get_books(self):
-        """
-        Get a list of books from the library.
+        return self._books
 
-        Returns:
-            list: A list of book objects.
-        """
-        books = [
-            {'title': 'Book 1', 'author': 'Author 1'},
-            {'title': 'Book 2', 'author': 'Author 2'},
-            {'title': 'Book 3', 'author': 'Author 3'},
-        ]
-        return books
+    def save_books_to_file(self, filename):
+        with open(filename, "w") as f:
+            for book in self._books:
+                f.write(f"{book.get_id()};{book.get_name()};{','.join(book.get_patterns())};{book.get_path()};{book.get_author()}\n")
 
-    def search_books(self, query):
-        """
-        Search for books in the library.
-
-        Args:
-            query (str): The search query.
-
-        Returns:
-            list: A list of book objects that match the query.
-        """
-        results = []
-        for book in self.get_books():
-            if query in book['title']:
-                results.append(book)
-        return results
-
-    def borrow_book(self, book):
-        """
-        Borrow a book from the library.
-
-        Args:
-            book (dict): The book to borrow.
-        """
-        book['borrowed'] = True
+    def load_books_from_file(self, filename):
+        with open(filename, "r") as f:
+            lines = f.readlines()
+            for line in lines:
+                book = Book.from_string(line.strip())
+                self._books.append(book)
