@@ -26,9 +26,9 @@ class LibraryTest(unittest.TestCase):
         library.add_book(book2)
         library.save_books_to_file('tmp_file')
         library2 = Library()
-        library2.load_books_from_file('tmp_file')
-        self.assertEqual(len(library2._books), 2)
-        self.assertTrue(library2.get_books()[0] == book2 or library2.get_books()[1] == book2)
+        library2.load_books_from_file('tmp_file.log')
+        self.assertTrue(book1 in set(library2.get_books()))
+        self.assertTrue(book2 in set(library2.get_books()))
         
 
 if __name__ == '__main__':

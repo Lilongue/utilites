@@ -31,14 +31,17 @@ class Entity:
         self._path = path
 
     def __str__(self):
-        return f"Entity(id={self.id}; name={self.name}; patterns={self.patterns}; path={self.path})"
+        return f'Entity(id={self.id}; name={self.name}; patterns={self.patterns}; path={self.path})'
 
     def __repr__(self):
         return str(self)
+    
+    def __hash__(self):
+        return hash(f'{self._name}{self._path}')
 
     @classmethod
     def from_string(cls, string):
-        data = string.split(";")
+        data = string.split(';')
         id = int(data[1])
         name = data[2]
         patterns = data[3].split()
