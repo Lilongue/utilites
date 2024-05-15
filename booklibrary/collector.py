@@ -6,7 +6,7 @@ import pyperclip
 THRESHOLD = 80
 SEP_FOR_STAT = '_-+. /|\\'
 SKIP_EXTENTIONS = ['zip', 'rar', 'gif', 'htm', 'html', 'auto', 'info', 'last']
-BOOK_EXTENTIONS = ['doc', 'epub', 'pdf', 'djvu', 'docx', 'xlsx' ]
+BOOK_EXTENTIONS = ['pdf', 'djvu', 'doc', 'chm', 'docx', 'rtf', 'txt', 'fb2', 'djv', 'epub']
 
 
 def get_path():
