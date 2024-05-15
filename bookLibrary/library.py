@@ -16,6 +16,7 @@ class Library:
     def get_books(self):
         return self._books
 
+
     def save_books_to_file(self, filename=DEFAULT_LIB_FILE):
         with open(filename, "w") as f:
             for book in self._books:
@@ -27,3 +28,7 @@ class Library:
             for line in lines:
                 book = Book.from_string(line.strip())
                 self._books.append(book)
+
+
+if __name__ == '__main__':
+    print('Library is building...')

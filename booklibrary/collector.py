@@ -8,6 +8,7 @@ SEP_FOR_STAT = '_-+. /|\\'
 SKIP_EXTENTIONS = ['zip', 'rar', 'gif', 'htm', 'html', 'auto', 'info', 'last']
 BOOK_EXTENTIONS = ['doc', 'epub', 'pdf', 'djvu', 'docx', 'xlsx' ]
 
+
 def get_path():
     """
     Get path from console user input or clipboard or from argument.
@@ -135,6 +136,19 @@ def count_separators(dictionary, separators):
             separator_counts[i] += value.count(separator)
     return separator_counts
 
+def get_filenames_and_paths(start_path):
+    dic_names = {}
+    dic_paths = {}
+
+    if start_path:
+        i = 1
+        for p, dirs, files in os.walk(start_path):
+            for f in files:
+                dic_names[i] = f
+                dic_paths[i] = os.path.join(p,f)
+                i += 1
+    return dic_names, dic_paths
+
 
 def get_filenames_and_paths(start_path):
     """
@@ -157,6 +171,7 @@ def get_filenames_and_paths(start_path):
                 dic_paths[i] = os.path.join(p,f)
                 i += 1
     return dic_names, dic_paths
+
 
 
 def find_same2(dir_names):
@@ -192,6 +207,7 @@ them as duplicates and returns a list of tuples containing the duplicate pattern
             print (f'Найдено {len(out)} дубликaтов')    
         print(f'Просмотрено {k} вариантов \r', end="")   
     return out
+
 
 
 def get_file_extension_statistics(filenames):
@@ -265,4 +281,5 @@ if __name__ == '__main__':
             out_str = str(i) + ' \t ' + str(dic_names[i]) + ' \t ' + str(dic_paths[i]) + ' \t ' + str(dic_pattern[i]) + ' \t ' + '\r\n'
             f.write(out_str)
     
+
     print('Все сделано')
