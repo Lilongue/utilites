@@ -5,7 +5,9 @@ import pyperclip
 
 THRESHOLD = 80
 SEP_FOR_STAT = '_-+. /|\\'
-SKIP_EXTENTIONS = ["zip", "rar", "gif", "htm", "html", "auto", "info", "last"]
+SKIP_EXTENTIONS = ['zip', 'rar', 'gif', 'htm', 'html', 'auto', 'info', 'last']
+BOOK_EXTENTIONS = ['doc', 'epub', 'pdf', 'djvu', 'docx', 'xlsx' ]
+
 
 def get_path():
     """
@@ -42,28 +44,60 @@ def get_path():
     return path
 
 
-def get_patterns(inp_str, delimiter = None):
+def get_patterns(inp_str, delimiter=None):
+    """
+    Extracts patterns from a string based on delimiters.
+
+    Args:
+        inp_str: The input string.
+        delimiter: A custom delimiter to split the string on.
+
+    Returns:
+        A tuple of patterns extracted from the string.
+    """
+
+    # Define default delimiters.
     delimiters = "_-. /"
-    out = []
+
+    # Use the custom delimiter if specified.
     if delimiter:
         delimiters = delimiter
-    tmp = []
-    tmp1 = []
+
+    # Initialize output list.
+    out = []
+
+    # Split the string based on delimiters.
     for sep in delimiters:
+        # Handle first delimiter.
         if not out:
             if sep in inp_str:
-                tmp = str(inp_str).split(sep)
+                tmp = inp_str.split(sep)
                 out = [s for s in tmp if s]
             continue
+
+        # Split subsequent parts recursively.
         tmp = []
         for part in out:
-            tmp1 = str(part).split(sep)
+            tmp1 = part.split(sep)
             for pease in tmp1:
                 tmp.append(pease)
         out = [s for s in tmp if s]
-    return tuple(filter (lambda x: x.strip() != '', out))
+
+    # Remove empty strings from the output.
+    return tuple(filter(lambda x: x.strip() != '', out))
+
 
 def check_pattern(pat1, pat2):
+    """
+    Checks the similarity between two patterns.
+
+    Args:
+        pat1: The first pattern.
+        pat2: The second pattern.
+
+    Returns:
+        A percentage indicating the degree of similarity between the patterns.
+    """
     pat_len = max(len(pat1), len(pat2))
     if pat_len == 0:
         return 0
@@ -84,6 +118,16 @@ def check_pattern(pat1, pat2):
     return int(100*(matches/pat_len))
 
 def count_separators(dictionary, separators):
+    """
+    Calculates the number of times each separator appears in the values of a dictionary.
+
+    Args:
+        dictionary: A dictionary of values.
+        separators: A list of separators to count.
+
+    Returns:
+        A list of counts for each separator.
+    """
     separator_counts = []
     for separator in separators:
         separator_counts.append(0)
@@ -106,7 +150,45 @@ def get_filenames_and_paths(start_path):
     return dic_names, dic_paths
 
 
+def get_filenames_and_paths(start_path):
+    """
+    Recursively iterates over a directory tree and returns a dictionary of filenames and paths.
+
+    Args:
+        start_path: The root directory to search.
+
+    Returns:
+        Two dictionaries containing: 'names' and 'paths'.
+    """
+    dic_names = {}
+    dic_paths = {}
+
+    if start_path:
+        i = 1
+        for p, dirs, files in os.walk(start_path):
+            for f in files:
+                dic_names[i] = f
+                dic_paths[i] = os.path.join(p,f)
+                i += 1
+    return dic_names, dic_paths
+
+
+
 def find_same2(dir_names):
+    """
+    Finding duplicate files based on their patterns.
+
+    This function iterates over a patterns listing and compares the patterns to every other
+one in the listing.
+    If the ratio of shared pattern parts between two patterns exceeds a specified threshold, the function identifies
+them as duplicates and returns a list of tuples containing the duplicate patterns.
+
+    Args:
+        dir_names: A dictionary of file name patterns.
+
+    Returns:
+        A list of tuples containing the names of duplicate patterns.
+    """
     listic = dir_names.items()
     tmp_set = set()
     out = []
@@ -126,6 +208,38 @@ def find_same2(dir_names):
         print(f'Просмотрено {k} вариантов \r', end="")   
     return out
 
+
+
+def get_file_extension_statistics(filenames):
+    """
+    Calculates statistics on file extensions in a list of filenames.
+
+    Args:
+        filenames: A list of filenames.
+
+    Returns:
+        A dictionary of extension statistics.
+    """
+
+    extension_stats = {}
+    extension_stats_percents = {}
+
+    for filename in filenames:
+        # Extract the file extension.
+        extension = os.path.splitext(filename)[1][1:]
+
+        # Increment the count of the extension.
+        if extension not in extension_stats:
+            extension_stats[extension] = 0
+        extension_stats[extension] += 1
+
+    # Calculate the percentage of each extension.
+    for extension, count in extension_stats.items():
+        extension_stats_percents[extension] = (count / len(filenames)) * 100
+
+    return extension_stats, extension_stats_percents
+
+
 if __name__ == '__main__':
     dic_pattern = {}
     start_path = get_path()
@@ -133,6 +247,12 @@ if __name__ == '__main__':
     print (list(SEP_FOR_STAT))
     print (count_separators(dic_names, SEP_FOR_STAT))
     sep = SEP_FOR_STAT
+    print('Статистика разрешений:')
+    extension_stats, extension_stats_percents = get_file_extension_statistics(dic_names.values())
+    print(extension_stats)
+    print('-'*20)
+    print(extension_stats_percents)
+
 
     for k in dic_names.keys():
         skip_pattern = False
@@ -161,4 +281,5 @@ if __name__ == '__main__':
             out_str = str(i) + ' \t ' + str(dic_names[i]) + ' \t ' + str(dic_paths[i]) + ' \t ' + str(dic_pattern[i]) + ' \t ' + '\r\n'
             f.write(out_str)
     
+
     print('Все сделано')
