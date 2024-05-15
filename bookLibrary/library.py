@@ -18,12 +18,12 @@ class Library:
 
 
     def save_books_to_file(self, filename=DEFAULT_LIB_FILE):
-        with open(filename, "w") as f:
+        with open(filename, "w", encoding='utf-8') as f:
             for book in self._books:
                 f.write(f"{book.get_id()};{book.get_name()};{','.join(book.get_patterns())};{book.get_path()};{book.get_author()}\n")
 
     def load_books_from_file(self, filename):
-        with open(filename, "r") as f:
+        with open(filename, "r", encoding='utf-8') as f:
             lines = f.readlines()
             for line in lines:
                 book = Book.from_string(line.strip())

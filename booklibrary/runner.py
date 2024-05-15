@@ -9,13 +9,14 @@ from library import Library
 
 def get_book_from_file_path(filename, path, id):
     extension = os.path.splitext(filename)[1][1:]
-    patterns = [] if extension not in collector.BOOK_EXTENTIONS else collector.get_patterns(os.path.splitext(filename)[0], collector.SEP_FOR_STAT)
+    patterns = [] if extension.lower() not in collector.BOOK_EXTENTIONS else collector.get_patterns(os.path.splitext(filename)[0], collector.SEP_FOR_STAT)
     return Book(id, filename, patterns, path, '')
 
 def collect_library(start_path):
     library = Library()
     current_id = 1
     if  os.path.exists(os.path.join(start_path, library.DEFAULT_LIB_FILE)):
+        print('Загружаю библиотеку из файла')
         library.load_books_from_file(library.DEFAULT_LIB_FILE)
         current_id = max(book.get_id() for book in library.get_books())
     else:
@@ -48,12 +49,12 @@ def execute_commands(library):
             break
         elif command.lower().startswith('one'):
             filename = pyperclip.paste()
-            print('filename : {filename}')
+            print(f'filename : {filename}')
             if filename:
                 print(find_similar(library, filename, 5))
         elif command.lower().startswith('calc'):
             filename = pyperclip.paste()
-            print('filename : {filename}')
+            print(f'filename : {filename}')
             if filename:
                 print('\n'.join(find_similar2(library, filename, 5)))
    
