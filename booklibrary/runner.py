@@ -26,14 +26,17 @@ def collect_library(start_path):
             current_id += 1
     return library
 
-def find_similar(library: Library, filename: str, count: int):
-    patterns = collector.get_patterns(filename, collector.SEP_FOR_STAT)
-    book_dict = {book.get_id(): 0 for book in library.get_books()}
-    book_ranged = sorted(library.get_books(), key=lambda x: collector.check_pattern(x.get_patterns(), patterns), reverse=True)
-    if len(book_ranged) <= count:
-        return book_ranged
-    return book_ranged[:count]
-
+def find_similars(library: Library, path: str):
+    files = collector.get_filenames(path)
+    out = {}
+    if files:
+        for filename in files:
+            out[filename] = find_similar2(library, filename, 4)
+    with open('similar.log', 'w', encoding='utf-8') as f:
+        for item in out.items():
+            f.write('\n' + item[0] + '\n' + '-'*20 + '\n')
+            f.write('\n'.join(item[1]))
+    
 def find_similar2(library: Library, filename: str, count: int):
     patterns = collector.get_patterns(filename, collector.SEP_FOR_STAT)
     book_dict = {book.get_id(): book for book in library.get_books()}
@@ -42,24 +45,30 @@ def find_similar2(library: Library, filename: str, count: int):
     return [f'{item[1]} : {book_dict.get(item[0])}' for item in similar_sorted[:count]]
 
 def execute_commands(library):
+    last_command = None
     while True:
-        command = input('Enter command: ').strip()
+        command = input('Enter command: ').strip().lower()
+        if not command and last_command:
+            command = last_command
 
-        if command.lower().startswith('quit'):
+        if command.startswith('quit'):
             break
-        elif command.lower().startswith('one'):
-            filename = pyperclip.paste()
-            print(f'filename : {filename}')
-            if filename:
-                print(find_similar(library, filename, 5))
-        elif command.lower().startswith('calc'):
+        elif command.startswith('calc'):
+            last_command = command
             filename = pyperclip.paste()
             print(f'filename : {filename}')
             if filename:
                 print('\n'.join(find_similar2(library, filename, 5)))
+        elif command.startswith('many'):
+            last_command = command
+            filename = pyperclip.paste()
+            print(f'path : {filename}')
+            if filename:
+               find_similars(library, filename)
    
         # Handle other commands here.
-        elif command == 'hello':
+        elif command.startswith('hello'):
+            last_command = command
             print('Hello, world!')
         
         else:

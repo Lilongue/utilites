@@ -239,6 +239,22 @@ def get_file_extension_statistics(filenames):
 
     return extension_stats, extension_stats_percents
 
+def get_filenames(input_path):
+    """
+    Gets all filenames from an input path without subpaths.
+
+    Args:
+        input_path: The input directory path.
+
+    Returns:
+        A list of filenames.
+    """
+    filenames = []
+    for filename in os.listdir(input_path):
+        if os.path.isfile(os.path.join(input_path, filename)):
+            filenames.append(filename)
+    return filenames
+
 
 if __name__ == '__main__':
     dic_pattern = {}
