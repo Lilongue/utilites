@@ -1,7 +1,9 @@
 
 import os
+import shutil
 
 import pyperclip
+from literation import detect_russian_letters, re_transliterate
 import collector
 from book import Book
 from library import Library
@@ -44,6 +46,22 @@ def find_similar2(library: Library, filename: str, count: int):
     similar_sorted = sorted(similar_dict.items(), key=lambda item: item[1], reverse=True)
     return [f'{item[1]} : {book_dict.get(item[0])}' for item in similar_sorted[:count]]
 
+def retranslate_files(path: str):
+    files = collector.get_filenames(path)
+    new_path = os.path.join(path, 'retranslated')
+    if not os.path.exists(new_path):
+        os.makedirs(new_path)
+    copy_retranslated_files(files, path, new_path)
+
+def copy_retranslated_files(filenames, source_path, target_path):
+    for filename in filenames:
+        if detect_russian_letters(filename):
+            continue
+        new_filename = re_transliterate(filename)
+        file_path = os.path.join(source_path, filename)
+        target_file_path = os.path.join(target_path, new_filename)
+        shutil.copy(file_path, target_file_path)
+
 def execute_commands(library):
     last_command = None
     while True:
@@ -59,12 +77,20 @@ def execute_commands(library):
             print(f'filename : {filename}')
             if filename:
                 print('\n'.join(find_similar2(library, filename, 5)))
+
         elif command.startswith('many'):
             last_command = command
-            filename = pyperclip.paste()
-            print(f'path : {filename}')
-            if filename:
-               find_similars(library, filename)
+            path = pyperclip.paste()
+            print(f'path : {path}')
+            if path:
+               find_similars(library, path)
+        
+        elif command.startswith('lit'):
+            last_command = command
+            path = pyperclip.paste()
+            print(f'path : {path}')
+            if path:
+               retranslate_files(path)
    
         # Handle other commands here.
         elif command.startswith('hello'):
