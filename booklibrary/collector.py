@@ -2,11 +2,10 @@ import os
 import sys
 import pyperclip
 
-
 THRESHOLD = 80
 SEP_FOR_STAT = '_-+. /|\\'
-SKIP_EXTENTIONS = ['zip', 'rar', 'gif', 'htm', 'html', 'auto', 'info', 'last']
-BOOK_EXTENTIONS = ['pdf', 'djvu', 'doc', 'chm', 'docx', 'rtf', 'txt', 'fb2', 'djv', 'epub']
+SKIP_EXTENSIONS = ['zip', 'rar', 'gif', 'htm', 'html', 'auto', 'info', 'last']
+BOOK_EXTENSIONS = ['pdf', 'djvu', 'doc', 'chm', 'docx', 'rtf', 'txt', 'fb2', 'djv', 'epub']
 
 
 def get_path():
@@ -24,17 +23,14 @@ def get_path():
         path = sys.argv[1]
         if not os.path.exists(path):
             path = None
-    
+
     # Try to get path from console input
     if path is None:
         path = input('Скопируйте или введите путь к папке: ')
 
     # Try to get path from clipboard
     if not path:
-        try:
-            path = pyperclip.paste()
-        except:
-            pass
+        path = pyperclip.paste()
 
     # Check if path is valid
     if not (path and os.path.exists(path)):
@@ -67,20 +63,20 @@ def get_patterns(inp_str, delimiter=None):
     out = []
 
     # Split the string based on delimiters.
-    for sep in delimiters:
+    for separator in delimiters:
         # Handle first delimiter.
         if not out:
-            if sep in inp_str:
-                tmp = inp_str.split(sep)
+            if separator in inp_str:
+                tmp = inp_str.split(separator)
                 out = [s for s in tmp if s]
             continue
 
         # Split subsequent parts recursively.
         tmp = []
-        for part in out:
-            tmp1 = part.split(sep)
-            for pease in tmp1:
-                tmp.append(pease)
+        for temp_part in out:
+            tmp1 = temp_part.split(separator)
+            for peace in tmp1:
+                tmp.append(peace)
         out = [s for s in tmp if s]
 
     # Remove empty strings from the output.
@@ -102,7 +98,7 @@ def check_pattern(pat1, pat2):
     if pat_len == 0:
         return 0
     matches = 0
-    s_part1, s_part2 = ([],[])
+    s_part1, s_part2 = ([], [])
     if type(pat1) is type('string'):
         s_part1.append(pat1)
     else:
@@ -115,7 +111,8 @@ def check_pattern(pat1, pat2):
         if p in s_part2:
             matches += 1
             continue
-    return int(100*(matches/pat_len))
+    return int(100 * (matches / pat_len))
+
 
 def count_separators(dictionary, separators):
     """
@@ -129,25 +126,12 @@ def count_separators(dictionary, separators):
         A list of counts for each separator.
     """
     separator_counts = []
-    for separator in separators:
+    for _ in separators:
         separator_counts.append(0)
     for value in dictionary.values():
         for i, separator in enumerate(separators):
             separator_counts[i] += value.count(separator)
     return separator_counts
-
-def get_filenames_and_paths(start_path):
-    dic_names = {}
-    dic_paths = {}
-
-    if start_path:
-        i = 1
-        for p, dirs, files in os.walk(start_path):
-            for f in files:
-                dic_names[i] = f
-                dic_paths[i] = os.path.join(p,f)
-                i += 1
-    return dic_names, dic_paths
 
 
 def get_filenames_and_paths(start_path):
@@ -168,10 +152,9 @@ def get_filenames_and_paths(start_path):
         for p, dirs, files in os.walk(start_path):
             for f in files:
                 dic_names[i] = f
-                dic_paths[i] = os.path.join(p,f)
+                dic_paths[i] = os.path.join(p, f)
                 i += 1
     return dic_names, dic_paths
-
 
 
 def find_same2(dir_names):
@@ -200,14 +183,13 @@ them as duplicates and returns a list of tuples containing the duplicate pattern
             continue
         tmp_set.add(i)
         for j in listic:
-            if check_pattern(dir_names[i],j[1]) > THRESHOLD:
+            if check_pattern(dir_names[i], j[1]) > THRESHOLD:
                 tmp.append(j[0])
         if len(tmp) > 1:
             out.append(tuple(tmp))
-            print (f'Найдено {len(out)} дубликaтов')    
-        print(f'Просмотрено {k} вариантов \r', end="")   
+            print(f'Найдено {len(out)} дубликaтов')
+        print(f'Просмотрено {k} вариантов \r', end="")
     return out
-
 
 
 def get_file_extension_statistics(filenames):
@@ -239,6 +221,7 @@ def get_file_extension_statistics(filenames):
 
     return extension_stats, extension_stats_percents
 
+
 def get_filenames(input_path):
     """
     Gets all filenames from an input path without subpaths.
@@ -259,20 +242,19 @@ def get_filenames(input_path):
 if __name__ == '__main__':
     dic_pattern = {}
     start_path = get_path()
-    dic_names, dic_paths =  get_filenames_and_paths(start_path)
-    print (list(SEP_FOR_STAT))
-    print (count_separators(dic_names, SEP_FOR_STAT))
+    dic_names, dic_paths = get_filenames_and_paths(start_path)
+    print(list(SEP_FOR_STAT))
+    print(count_separators(dic_names, SEP_FOR_STAT))
     sep = SEP_FOR_STAT
     print('Статистика разрешений:')
     extension_stats, extension_stats_percents = get_file_extension_statistics(dic_names.values())
     print(extension_stats)
-    print('-'*20)
+    print('-' * 20)
     print(extension_stats_percents)
-
 
     for k in dic_names.keys():
         skip_pattern = False
-        for ext in SKIP_EXTENTIONS:
+        for ext in SKIP_EXTENSIONS:
             if dic_names[k].endswith(ext):
                 skip_pattern = True
                 break
@@ -284,18 +266,18 @@ if __name__ == '__main__':
             dic_pattern[k] = part
         else:
             dic_pattern[k] = dic_names[k][:-4]
-    
+
     repited = find_same2(dic_pattern)
 
-    with open('matches.log','w', encoding='utf-8') as f:
+    with open('matches.log', 'w', encoding='utf-8') as f:
         for rep in repited:
             for n in rep:
                 f.write(str(n) + ' \t ' + str(dic_names[n]) + ' \t ' + str(dic_paths[n]) + '\r\n')
 
     with open('result.log', 'w', encoding='utf-8') as f:
         for i in dic_names:
-            out_str = str(i) + ' \t ' + str(dic_names[i]) + ' \t ' + str(dic_paths[i]) + ' \t ' + str(dic_pattern[i]) + ' \t ' + '\r\n'
+            out_str = str(i) + ' \t ' + str(dic_names[i]) + ' \t ' + str(dic_paths[i]) + ' \t ' + str(
+                dic_pattern[i]) + ' \t ' + '\r\n'
             f.write(out_str)
-    
 
     print('Все сделано')

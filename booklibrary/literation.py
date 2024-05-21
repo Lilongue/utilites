@@ -1,14 +1,12 @@
 import re
 
 
-def transliterate(text, source_lang, target_lang):
+def transliterate(text):
     """
     Transliterates a string from one language to another.
 
     Args:
         text (str): The string to transliterate.
-        source_lang (str): The language of the source string.
-        target_lang (str): The language of the target string.
 
     Returns:
         str: The transliterated string.
@@ -42,6 +40,8 @@ def transliterate(text, source_lang, target_lang):
         'щ': 'shch',
         'ч': 'ch',
         'ш': 'sh',
+        'ю': 'iu',
+        'я': 'ya',
     }
 
     # Transliterate the string.
@@ -55,14 +55,13 @@ def transliterate(text, source_lang, target_lang):
     # Return the transliterated string.
     return transliterated_text
 
+
 def re_transliterate(text):
     """
     Transliterates a string from one language to another.
 
     Args:
-        text (str): The string to transliterate.
-        source_lang (str): The language of the source string.
-        target_lang (str): The language of the target string.
+        text (str): The string to re-transliterate.
 
     Returns:
         str: The transliterated string.
@@ -70,32 +69,37 @@ def re_transliterate(text):
 
     # Create a dictionary of transliteration rules.
     transliteration_rules = {
-        'a' : 'а',
-        'b' : 'б',
-        'v' : 'в',
-        'g' : 'г',
-        'd' : 'д',
-        'e' : 'е',
-        'z' : 'з',
-        'i' : 'и',
-        'k' : 'к',
-        'l' : 'л',
-        'm' : 'м',
-        'n' : 'н',
-        'o' : 'о',
-        'p' : 'п',
-        'r' : 'р',
-        's' : 'с',
-        't' : 'т',
-        'u' : 'у',
-        'f' : 'ф',
-        'h' : 'х',
-        'y' : 'ы',
-        '\'' : 'ь',
-        'zh' : 'ж',
-        'shch' : 'щ',
-        'ch' : 'ч',
-        'sh' : 'ш',
+        'a': 'а',
+        'b': 'б',
+        'v': 'в',
+        'g': 'г',
+        'd': 'д',
+        'e': 'е',
+        'z': 'з',
+        'i': 'и',
+        'j': 'й',
+        'k': 'к',
+        'l': 'л',
+        'm': 'м',
+        'n': 'н',
+        'o': 'о',
+        'p': 'п',
+        'r': 'р',
+        's': 'с',
+        't': 'т',
+        'u': 'у',
+        'f': 'ф',
+        'h': 'х',
+        'y': 'ы',
+        '\'': 'ь',
+        'zh': 'ж',
+        'shch': 'щ',
+        'ch': 'ч',
+        'sh': 'ш',
+        'iu': 'ю',
+        'yu': 'ю',
+        'ya': 'я',
+        'ja': 'я',
     }
 
     # Transliterate the string.
@@ -114,17 +118,19 @@ def re_transliterate(text):
         tmp_text = tmp_text[1:]
         transliterated_text += transliteration_rules.get(literal1, literal1)
 
-
     # Return the transliterated string.
     return transliterated_text
 
-def get_literals_set(text):
-    return get_next_leteral(text, 1), get_next_leteral(text, 2), get_next_leteral(text, 4)
 
-def get_next_leteral(text, base=1):
+def get_literals_set(text):
+    return get_next_literal(text, 1), get_next_literal(text, 2), get_next_literal(text, 4)
+
+
+def get_next_literal(text, base=1):
     if len(text) >= base:
         return text[:base].lower()
     return ''
+
 
 def detect_russian_letters(string):
     """
@@ -139,4 +145,3 @@ def detect_russian_letters(string):
 
     regex = r"[\u0400-\u04FF]"
     return bool(re.search(regex, string))
-
