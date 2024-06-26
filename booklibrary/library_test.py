@@ -24,7 +24,7 @@ class LibraryTest(unittest.TestCase):
         book2 = Book.from_string(book_string2)
         library.add_book(book1)
         library.add_book(book2)
-        library.save_books_to_file('tmp_file')
+        library.save_books_to_file('tmp_file.log')
         library2 = Library()
         library2.load_books_from_file('tmp_file.log')
         self.assertTrue(book1 in set(library2.get_books()))
