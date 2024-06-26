@@ -2,7 +2,7 @@
 
 utilites for home usage
 
-## Library processing
+## Library processing (booklibrary package)
 
 utilites for work with home library
 
@@ -43,6 +43,7 @@ utilites for work with home library
 | calc  | выводит 5 самых похожих файлов библиотеки на переданный (взятый из буфера обмена)  |
 | many  | для всех файлов из переданной папки ищет 3 максимально похожих в библиотеке и сохраняет результат в файл similar.log (файлы с русскими буквами в именах  не обрабатываются и не копируются)  |
 | lit  | для всех файлов из переданной папки делает копии с обратной транслитерацией и сохраняет их в папке /retranslated  |
+| dbsave  | сохраняет библиотеку в базу данных  |
 | hello  | просто выводит Hello, world!  |
 
 > [!NOTE]
@@ -52,3 +53,25 @@ utilites for work with home library
 Содерщит метод транслитерации и обратной транслитерации (transliterate и re_transliterate)
 А также детектор русских кукв в тексте detect_russian_letters.
 Самостоятельно - не запускается
+
+## Утилиты для работы с SqlLite (booklibrary.dbutils)
+
+utilites for work with SqlLite database
+
+**Основные компоненты**
+
+### create_tables
+Создает пустую базу данных со структурой таблиц для библиотеки
+
+### book_dao
+Содержит класс BookDao, который содержит основные методы для работы с базой данных.
+
+**Доступные методы:**
+
+| Метод  | Параметры | Действие |
+| ------------- | ------------- | ------------- |
+| create_book  | book: Book | создает запись в таблице books  |
+| get_book  | book_id: int | получет запись из таблицы books по id |
+| update_book  | book: Book | сетит в таблице books запись по id |
+| delete_book  | book_id: int | удаляет запись из таблицы books по id  |
+
