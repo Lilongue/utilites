@@ -1,8 +1,11 @@
 import os
 import shutil
+import sys
+sys.path.append(os.getcwd())
 
 import pyperclip
 from literation import detect_russian_letters, re_transliterate
+from booklibrary.dbutils.book_dao import BookDao
 import collector
 from book import Book
 from library import Library
@@ -66,6 +69,11 @@ def copy_re_translated_files(filenames, source_path, target_path):
         target_file_path = os.path.join(target_path, new_filename)
         shutil.copy(file_path, target_file_path)
 
+def save_books_to_db(library: Library, db_file: str = 'home_lib.db') -> None:
+    book_dao = BookDao(db_file)
+    for book in library.get_books():
+        book_dao.create_book(book)
+
 
 def execute_commands(library):
     last_command = None
@@ -96,6 +104,11 @@ def execute_commands(library):
             print(f'path : {path}')
             if path:
                 re_translate_files(path)
+        
+        elif command.startswith('dbsave'):
+            last_command = None
+            save_books_to_db(library)
+
 
         # Handle other commands here.
         elif command.startswith('hello'):
