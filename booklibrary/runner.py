@@ -1,6 +1,7 @@
 import os
 import shutil
 import sys
+
 sys.path.append(os.getcwd())
 
 import pyperclip
@@ -18,10 +19,10 @@ def get_book_from_file_path(filename, path, id):
     return Book(id, filename, patterns, path, '')
 
 
-def collect_library(start_path):
+def collect_library(start_path: str, load_from_file: bool = True) -> Library:
     library = Library()
     current_id = 1
-    if os.path.exists(os.path.join(start_path, library.DEFAULT_LIB_FILE)):
+    if os.path.exists(os.path.join(start_path, library.DEFAULT_LIB_FILE)) and load_from_file:
         print('Загружаю библиотеку из файла')
         library.load_books_from_file(library.DEFAULT_LIB_FILE)
     else:
@@ -69,10 +70,41 @@ def copy_re_translated_files(filenames, source_path, target_path):
         target_file_path = os.path.join(target_path, new_filename)
         shutil.copy(file_path, target_file_path)
 
+
 def save_books_to_db(library: Library, db_file: str = 'home_lib.db') -> None:
     book_dao = BookDao(db_file)
     for book in library.get_books():
         book_dao.create_book(book)
+
+
+def check_lib_update(library: Library, path: str) -> None:
+    print('Загружаю обновленную коллекцию...')
+    new_library = collect_library(path, False)
+    print('Ищу потерянные книги...')
+    diff_lost = '\n'.join([book.to_full_string() for book in collect_the_difference(library, new_library)])
+    print('Ищу новые книги...')
+    diff_new = '\n'.join([book.to_full_string() for book in collect_the_difference(new_library, library)])
+    print('Lost books:', diff_lost)
+    print('New books:', diff_new)
+    with open('differ.log', 'w', encoding='utf-8') as f:
+        f.write('Lost books: \n')
+        f.write(diff_lost)
+        f.write('\n New books: \n')
+        f.write(diff_new)
+
+
+def collect_the_difference(library1: Library, library2: Library) -> list[Book]:
+    out_difference = []
+    for book1 in library1.get_books():
+        is_found = False
+        for book2 in library2.get_books():
+            if book1 == book2:
+                print('!found!!')
+                is_found = True
+                break
+        if not is_found:
+            out_difference.append(book1)
+    return out_difference
 
 
 def execute_commands(library):
@@ -104,11 +136,17 @@ def execute_commands(library):
             print(f'path : {path}')
             if path:
                 re_translate_files(path)
-        
+
+        elif command.startswith('differ'):
+            last_command = command
+            path = pyperclip.paste()
+            print(f'path : {path}')
+            if path:
+                check_lib_update(library, path)
+
         elif command.startswith('dbsave'):
             last_command = None
             save_books_to_db(library)
-
 
         # Handle other commands here.
         elif command.startswith('hello'):
