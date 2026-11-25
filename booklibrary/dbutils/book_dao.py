@@ -25,7 +25,7 @@ class BookDao:
 
     def get_book(self: 'BookDao', book_id: int) -> Book:
         get_book_sql = 'SELECT * FROM book WHERE book_id = ?'
-        with sqlite3.connect(self._db_file).cursor() as connection:
+        with sqlite3.connect(self._db_file) as connection:
             cursor = connection.cursor()
             cursor.execute(get_book_sql, (book_id,))
             return cursor.fetchone()
@@ -33,7 +33,7 @@ class BookDao:
     def update_book(self: 'BookDao', book: Book) -> None:
         update_book_sql = 'UPDATE book SET title = ?, book_path = ?, patterns = ?, author = ?, has_real_copy = ?,' \
                           ' periodic_number = ?, publishing_year = ? WHERE book_id = ?'
-        with sqlite3.connect(self._db_file).cursor() as connection:
+        with sqlite3.connect(self._db_file) as connection:
             cursor = connection.cursor()
             cursor.execute(update_book_sql, (
                 book.get_name(), book.get_path(), ", ".join(book.get_patterns()), book.get_author(),
@@ -42,7 +42,7 @@ class BookDao:
 
     def delete_book(self: 'BookDao', book_id: int) -> None:
         delete_book_sql = 'DELETE FROM book WHERE book_id = ?'
-        with sqlite3.connect(self._db_file).cursor() as connection:
+        with sqlite3.connect(self._db_file) as connection:
             cursor = connection.cursor()
             cursor.execute(delete_book_sql, (book_id,))
             connection.commit()
