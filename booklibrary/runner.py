@@ -99,7 +99,6 @@ def collect_the_difference(library1: Library, library2: Library) -> list[Book]:
         is_found = False
         for book2 in library2.get_books():
             if book1 == book2:
-                print('!found!!')
                 is_found = True
                 break
         if not is_found:
