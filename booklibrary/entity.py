@@ -35,7 +35,7 @@ class Entity:
 
     def __repr__(self: 'Entity') -> str:
         return str(self)
-    
+
     def __hash__(self: 'Entity') -> int:
         return hash(f'{self._name}{self._path}')
 
@@ -46,4 +46,4 @@ class Entity:
         name = data[2]
         patterns = data[3].split()
         path = data[4]
-        return cls(id, name, patterns, path)
+        return Entity(id, name, patterns, path)
